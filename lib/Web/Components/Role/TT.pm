@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.2.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.2.%d', q$Rev: 2 $ =~ /\d+/gmx );
 
 use Class::Usul::Constants  qw( EXCEPTION_CLASS NUL TRUE );
 use Class::Usul::Functions  qw( throw );
@@ -38,8 +38,8 @@ has '_templater' => is => 'lazy', isa => Object, builder => $_build__templater;
 sub render_template {
    my ($self, $req, $stash) = @_;
 
-   $self->can( 'stash_template_functions' )
-      and $self->stash_template_functions( $req, $stash );
+   $self->can( 'render_template_pre_hook' )
+      and $self->render_template_pre_hook( $req, $stash );
 
    my $result =  NUL;
    my $conf   =  $stash->{config} //= $self->config;
@@ -114,7 +114,7 @@ The path to the template file is F<< templates/<skin>/<layout>.tt >>. The
 C<skin> and C<layout> attributes default to the values of the configuration
 object
 
-If the consuming class has a C<stash_template_functions> method it is called
+If the consuming class has a C<render_template_pre_hook> method it is called
 passing in the C<request> and C<stash> arguments. It is expected that this
 method will add code references to the stash that can be called from the
 templates

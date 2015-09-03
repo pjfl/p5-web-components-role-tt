@@ -27,6 +27,7 @@ use File::Spec::Functions qw( catdir );
 my $test = Test->new;
 
 can_ok $test, 'render_template';
+
 is $test->templates, catdir( 't', 'root', 'templates' ), 'Template directory';
 
 my $rendered = $test->render_template( {}, {} ); chomp $rendered;
