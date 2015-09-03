@@ -1,5 +1,6 @@
 Revision history for Web::Components::Role::TT
 
+          - Removed pre hook bad API design
           - Improved naming for pre hook method
 
 0.2.1     2015-09-02 15:21:52

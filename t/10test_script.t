@@ -30,11 +30,11 @@ can_ok $test, 'render_template';
 
 is $test->templates, catdir( 't', 'root', 'templates' ), 'Template directory';
 
-my $rendered = $test->render_template( {}, {} ); chomp $rendered;
+my $rendered = $test->render_template( {} ); chomp $rendered;
 
 is $rendered, '<!-- Layout standard -->', 'Renders template';
 
-eval { $test->render_template( {}, { page => { layout => 'not_found' } } ) };
+eval { $test->render_template( { page => { layout => 'not_found' } } ) };
 
 my $e = $EVAL_ERROR;
 
