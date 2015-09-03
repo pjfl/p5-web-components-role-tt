@@ -1,5 +1,6 @@
 Revision history for Web::Components::Role::TT
 
+          - Fixed exception throwing right class
           - Dropped dependency on Class::Usul
 
 0.3.1     2015-09-03 10:08:04

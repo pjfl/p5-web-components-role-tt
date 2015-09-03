@@ -1,8 +1,8 @@
 package Web::Components::Role::TT;
 
 use 5.010001;
-use namespace::autoclean -except => 'EXCEPTION_CLASS';
-use version; our $VERSION = qv( sprintf '0.3.%d', q$Rev: 2 $ =~ /\d+/gmx );
+use namespace::autoclean;
+use version; our $VERSION = qv( sprintf '0.3.%d', q$Rev: 3 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -92,6 +92,10 @@ Defines the following attributes;
 A lazily evaluated directory which defaults to F<templates> in the configuration
 root directory. This is where the templates are stored
 
+The path to the template file is F<< templates/<skin>/<layout>.tt >>. The
+C<skin> and C<layout> attributes default to the values of the configuration
+object
+
 =back
 
 =head1 Subroutines/Methods
@@ -104,10 +108,6 @@ The C<$stash> hash reference may contain a C<config> attribute, otherwise the
 invocant is expected to provide a C<config> object. The C<$stash> should also
 contain C<skin> and C<page> attributes. The C<page> hash reference should
 contain a C<layout> attribute
-
-The path to the template file is F<< templates/<skin>/<layout>.tt >>. The
-C<skin> and C<layout> attributes default to the values of the configuration
-object
 
 =head1 Diagnostics
 

@@ -28,6 +28,10 @@ Defines the following attributes;
     A lazily evaluated directory which defaults to `templates` in the configuration
     root directory. This is where the templates are stored
 
+    The path to the template file is `templates/<skin>/<layout>.tt`. The
+    `skin` and `layout` attributes default to the values of the configuration
+    object
+
 # Subroutines/Methods
 
 ## `render_template`
@@ -38,10 +42,6 @@ The `$stash` hash reference may contain a `config` attribute, otherwise the
 invocant is expected to provide a `config` object. The `$stash` should also
 contain `skin` and `page` attributes. The `page` hash reference should
 contain a `layout` attribute
-
-The path to the template file is `templates/<skin>/<layout>.tt`. The
-`skin` and `layout` attributes default to the values of the configuration
-object
 
 # Diagnostics
 

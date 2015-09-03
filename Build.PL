@@ -18,7 +18,7 @@ my $prereqs  = {
     'File::DataClass' => 'v0.66.0',
     'Moo' => '2.000001',
     'Template' => '2.26',
-    'Unexpected' => 'v0.39.0',
+    'Unexpected' => 'v0.40.0',
     'namespace::autoclean' => '0.26',
     'perl' => '5.010001'
   },
