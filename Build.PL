@@ -15,7 +15,6 @@ my $prereqs  = {
     'version' => '0.88'
   },
   'requires' => {
-    'Class::Usul' => 'v0.65.0',
     'File::DataClass' => 'v0.66.0',
     'Moo' => '2.000001',
     'Template' => '2.26',

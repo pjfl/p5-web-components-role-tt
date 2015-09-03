@@ -1,4 +1,3 @@
-requires "Class::Usul" => "v0.65.0";
 requires "File::DataClass" => "v0.66.0";
 requires "Moo" => "2.000001";
 requires "Template" => "2.26";

@@ -1,14 +1,13 @@
 package Web::Components::Role::TT;
 
 use 5.010001;
-use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.3.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use namespace::autoclean -except => 'EXCEPTION_CLASS';
+use version; our $VERSION = qv( sprintf '0.3.%d', q$Rev: 2 $ =~ /\d+/gmx );
 
-use Class::Usul::Constants  qw( EXCEPTION_CLASS NUL TRUE );
-use Class::Usul::Functions  qw( throw );
-use File::DataClass::Types  qw( Directory Object );
+use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
+use File::DataClass::Types     qw( Directory Object );
 use Template;
-use Unexpected::Functions   qw( PathNotFound );
+use Unexpected::Functions      qw( PathNotFound throw );
 use Moo::Role;
 
 requires qw( config );
