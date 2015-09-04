@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.3.%d', q$Rev: 3 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.3.%d', q$Rev: 4 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -10,7 +10,7 @@ use Template;
 use Unexpected::Functions      qw( PathNotFound throw );
 use Moo::Role;
 
-requires qw( config );
+requires qw( config ); # layout root skin tempdir
 
 # Attribute constructors
 my $_build__templater = sub {
@@ -62,13 +62,12 @@ __END__
 
 =head1 Name
 
-Web::Components::Role::TT - Applies Template as Web::Component role
+Web::Components::Role::TT - Applies Template as a Moo::Role
 
 =head1 Synopsis
 
    use Moo;
 
-   with 'Web::Components::Role';
    with 'Web::Components::Role::TT';
 
    $rendered_template = $self->render_template( $stash );
@@ -117,8 +116,6 @@ temporary directory
 =head1 Dependencies
 
 =over 3
-
-=item L<Class::Usul>
 
 =item L<File::DataClass>
 
