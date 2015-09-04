@@ -1,12 +1,11 @@
 # Name
 
-Web::Components::Role::TT - Applies Template as Web::Component role
+Web::Components::Role::TT - Applies Template as a Moo::Role
 
 # Synopsis
 
     use Moo;
 
-    with 'Web::Components::Role';
     with 'Web::Components::Role::TT';
 
     $rendered_template = $self->render_template( $stash );
@@ -50,7 +49,6 @@ temporary directory
 
 # Dependencies
 
-- [Class::Usul](https://metacpan.org/pod/Class::Usul)
 - [File::DataClass](https://metacpan.org/pod/File::DataClass)
 - [Moo](https://metacpan.org/pod/Moo)
 - [Template](https://metacpan.org/pod/Template)
