@@ -1,5 +1,6 @@
 Revision history for Web::Components::Role::TT
 
+          - Can pass template in stash, page, layout
           - Adding badges to documentation
 
 0.4.1     2015-09-04 19:03:10

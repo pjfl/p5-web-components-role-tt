@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.4.%d', q$Rev: 2 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.4.%d', q$Rev: 3 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -39,15 +39,22 @@ sub render_template {
 
    my $result =  NUL;
    my $conf   =  $stash->{config} //= $self->config;
-   my $skin   =  $stash->{skin  } //= $conf->skin;
    my $page   =  $stash->{page  } //= {};
-   my $layout = ($page->{layout } //= $conf->layout).'.tt';
-   my $path   =  $self->templates->catfile( $skin, $layout );
+   my $layout = ($page->{layout } //= $conf->layout);
 
-   $path->exists or throw PathNotFound, [ $path ];
-   $self->_templater->process
-      ( $path->abs2rel( $self->templates ), $stash, \$result )
-      or throw $self->_templater->error;
+   if (ref $layout) {
+      $self->_templater->process( $layout, $stash, \$result )
+         or throw $self->_templater->error;
+   }
+   else {
+      my $skin = $stash->{skin} //= $conf->skin;
+      my $path = $self->templates->catfile( $skin, "${layout}.tt" );
+
+      $path->exists or throw PathNotFound, [ $path ];
+      $self->_templater->process
+         ( $path->abs2rel( $self->templates ), $stash, \$result )
+         or throw $self->_templater->error;
+   }
 
    return $result;
 }
@@ -155,7 +162,7 @@ Peter Flanigan, C<< <pjfl@cpan.org> >>
 
 =head1 License and Copyright
 
-Copyright (c) 2015 Peter Flanigan. All rights reserved
+Copyright (c) 2016 Peter Flanigan. All rights reserved
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See L<perlartistic>
