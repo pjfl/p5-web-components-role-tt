@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.4.%d', q$Rev: 3 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.4.%d', q$Rev: 4 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -21,6 +21,7 @@ my $_build__templater = sub {
       ENCODING     => 'utf8',
       RELATIVE     => TRUE,
       INCLUDE_PATH => [ $self->templates->pathname ], };
+   # uncoverable branch true
    my $template    =  Template->new( $args ) or throw $Template::ERROR;
 
    return $template;
@@ -51,6 +52,7 @@ sub render_template {
       my $path = $self->templates->catfile( $skin, "${layout}.tt" );
 
       $path->exists or throw PathNotFound, [ $path ];
+      # uncoverable branch true
       $self->_templater->process
          ( $path->abs2rel( $self->templates ), $stash, \$result )
          or throw $self->_templater->error;
@@ -70,6 +72,7 @@ __END__
 =begin html
 
 <a href="https://travis-ci.org/pjfl/p5-web-components-role-tt"><img src="https://travis-ci.org/pjfl/p5-web-components-role-tt.svg?branch=master" alt="Travis CI Badge"></a>
+<a href="https://roxsoft.co.uk/coverage/report/web-components-role-tt/latest"><img src="https://roxsoft.co.uk/coverage/badge/web-components-role-tt/latest" alt="Coverage Badge"></a>
 <a href="http://badge.fury.io/pl/Web-Components-Role-TT"><img src="https://badge.fury.io/pl/Web-Components-Role-TT.svg" alt="CPAN Badge"></a>
 <a href="http://cpants.cpanauthors.org/dist/Web-Components-Role-TT"><img src="http://cpants.cpanauthors.org/dist/Web-Components-Role-TT.png" alt="Kwalitee Badge"></a>
 
@@ -122,6 +125,9 @@ The C<$stash> hash reference may contain a C<config> attribute, otherwise the
 invocant is expected to provide a C<config> object. The C<$stash> should also
 contain C<skin> and C<page> attributes. The C<page> hash reference should
 contain a C<layout> attribute
+
+The layout attribute is either a path to the template or a scalar reference
+that contains the template
 
 =head1 Diagnostics
 

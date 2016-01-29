@@ -1,5 +1,6 @@
 <div>
     <a href="https://travis-ci.org/pjfl/p5-web-components-role-tt"><img src="https://travis-ci.org/pjfl/p5-web-components-role-tt.svg?branch=master" alt="Travis CI Badge"></a>
+    <a href="https://roxsoft.co.uk/coverage/report/web-components-role-tt/latest"><img src="https://roxsoft.co.uk/coverage/badge/web-components-role-tt/latest" alt="Coverage Badge"></a>
     <a href="http://badge.fury.io/pl/Web-Components-Role-TT"><img src="https://badge.fury.io/pl/Web-Components-Role-TT.svg" alt="CPAN Badge"></a>
     <a href="http://cpants.cpanauthors.org/dist/Web-Components-Role-TT"><img src="http://cpants.cpanauthors.org/dist/Web-Components-Role-TT.png" alt="Kwalitee Badge"></a>
 </div>
@@ -47,6 +48,9 @@ The `$stash` hash reference may contain a `config` attribute, otherwise the
 invocant is expected to provide a `config` object. The `$stash` should also
 contain `skin` and `page` attributes. The `page` hash reference should
 contain a `layout` attribute
+
+The layout attribute is either a path to the template or a scalar reference
+that contains the template
 
 # Diagnostics
 

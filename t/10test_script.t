@@ -36,9 +36,21 @@ is $rendered, '<!-- Layout standard -->', 'Renders template';
 
 eval { $test->render_template( { page => { layout => 'not_found' } } ) };
 
-my $e = $EVAL_ERROR;
+is $EVAL_ERROR->class, 'PathNotFound', 'Throws on missing template';
 
-is $e->class, 'PathNotFound', 'Throws on missing template';
+my $layout = '[% test %]';
+
+$rendered = $test->render_template( { page => { layout => \$layout },
+                                      test => 'dummy', } );
+
+is $rendered, 'dummy', 'Renders from scalar ref';
+
+$layout = '[% ] %]';
+
+eval { $test->render_template( { page => { layout => \$layout },
+                                 test => 'dummy', } ) };
+
+like $EVAL_ERROR, qr{ \Qparse error\E }mx, 'Parse error';
 
 done_testing;
 

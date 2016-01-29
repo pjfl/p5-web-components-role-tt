@@ -1,5 +1,6 @@
 Revision history for Web::Components::Role::TT
 
+          - Added coverage badge
           - Can pass template in stash, page, layout
           - Adding badges to documentation
 
