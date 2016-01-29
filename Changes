@@ -1,5 +1,8 @@
 Revision history for Web::Components::Role::TT
 
+          - Restructured configuration attributes
+            Deprecate stash page layout in favour of stash template layout
+
 0.5.1     2016-01-29 13:21:57
           - Added coverage badge
           - Can pass template in stash, page, layout

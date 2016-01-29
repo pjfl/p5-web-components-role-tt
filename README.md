@@ -45,9 +45,12 @@ Defines the following attributes;
     $rendered_template = $self->render_template( $stash );
 
 The `$stash` hash reference may contain a `config` attribute, otherwise the
-invocant is expected to provide a `config` object. The `$stash` should also
-contain `skin` and `page` attributes. The `page` hash reference should
-contain a `layout` attribute
+invocant is expected to provide a `config` object
+
+The `$stash` should contain either a `template` attribute or `skin` and
+`page` attributes. If a `template` attribute is provided it should be a hash
+reference containing `skin` and `layout` attributes. If the `page` attribute
+is provided it should be a hash reference that contains a `layout` attribute
 
 The layout attribute is either a path to the template or a scalar reference
 that contains the template

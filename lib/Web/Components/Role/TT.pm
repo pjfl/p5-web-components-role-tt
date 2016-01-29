@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.5.%d', q$Rev: 2 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.5.%d', q$Rev: 3 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -34,27 +34,45 @@ has 'templates'  => is => 'lazy', isa => Directory, coerce => TRUE,
 # Private attributes
 has '_templater' => is => 'lazy', isa => Object, builder => $_build__templater;
 
+# Private functions
+my $_layout = sub {
+   my ($conf, $stash) = @_;
+
+   my $plate  = $stash->{template} //= {};
+   my $page   = $stash->{page    } //= {};
+   my $layout = $plate->{layout  } //  $page->{layout} // $conf->layout;
+
+   return $plate->{layout} = $page->{layout} = $layout;
+};
+
+my $_skin = sub {
+   my ($conf, $stash) = @_;
+
+   my $plate = $stash->{template} //= {};
+   my $skin  = $plate->{skin    } //  $stash->{skin} // $conf->skin;
+
+   return $plate->{skin} = $stash->{skin} = $skin;
+};
+
 # Public methods
 sub render_template {
    my ($self, $stash) = @_; $stash //= {};
 
-   my $result =  NUL;
-   my $conf   =  $stash->{config} //= $self->config;
-   my $page   =  $stash->{page  } //= {};
-   my $layout = ($page->{layout } //= $conf->layout);
+   my $result = NUL;
+   my $conf   = $stash->{config} //= $self->config;
+   my $layout = $_layout->( $conf, $stash );
 
    if (ref $layout) {
       $self->_templater->process( $layout, $stash, \$result )
          or throw $self->_templater->error;
    }
    else {
-      my $skin = $stash->{skin} //= $conf->skin;
-      my $path = $self->templates->catfile( $skin, "${layout}.tt" );
+      my $plates = $self->templates;
+      my $path   = $plates->catfile( $_skin->( $conf, $stash ), "${layout}.tt");
 
       $path->exists or throw PathNotFound, [ $path ];
       # uncoverable branch true
-      $self->_templater->process
-         ( $path->abs2rel( $self->templates ), $stash, \$result )
+      $self->_templater->process( $path->abs2rel( $plates ), $stash, \$result )
          or throw $self->_templater->error;
    }
 
@@ -122,9 +140,12 @@ object
    $rendered_template = $self->render_template( $stash );
 
 The C<$stash> hash reference may contain a C<config> attribute, otherwise the
-invocant is expected to provide a C<config> object. The C<$stash> should also
-contain C<skin> and C<page> attributes. The C<page> hash reference should
-contain a C<layout> attribute
+invocant is expected to provide a C<config> object
+
+The C<$stash> should contain either a C<template> attribute or C<skin> and
+C<page> attributes. If a C<template> attribute is provided it should be a hash
+reference containing C<skin> and C<layout> attributes. If the C<page> attribute
+is provided it should be a hash reference that contains a C<layout> attribute
 
 The layout attribute is either a path to the template or a scalar reference
 that contains the template
