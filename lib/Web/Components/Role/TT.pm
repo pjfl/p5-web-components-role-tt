@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.5.%d', q$Rev: 3 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.5.%d', q$Rev: 4 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -54,6 +54,20 @@ my $_skin = sub {
    return $plate->{skin} = $stash->{skin} = $skin;
 };
 
+my $_template_path = sub {
+   my ($self, $conf, $stash, $layout) = @_; my $templates = $self->templates;
+
+   my $path = $templates->catfile( $_skin->( $conf, $stash ), "${layout}.tt" );
+
+   $path->exists and return $path->abs2rel( $templates );
+
+   my $alt  = $templates->catfile( $conf->skin, "${layout}.tt" );
+
+   $alt->exists or throw PathNotFound, [ $path ];
+
+   return $alt->abs2rel( $templates );
+};
+
 # Public methods
 sub render_template {
    my ($self, $stash) = @_; $stash //= {};
@@ -67,12 +81,10 @@ sub render_template {
          or throw $self->_templater->error;
    }
    else {
-      my $plates = $self->templates;
-      my $path   = $plates->catfile( $_skin->( $conf, $stash ), "${layout}.tt");
+      my $path = $self->$_template_path( $conf, $stash, $layout );
 
-      $path->exists or throw PathNotFound, [ $path ];
       # uncoverable branch true
-      $self->_templater->process( $path->abs2rel( $plates ), $stash, \$result )
+      $self->_templater->process( $path, $stash, \$result )
          or throw $self->_templater->error;
    }
 

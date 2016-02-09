@@ -1,5 +1,6 @@
 Revision history for Web::Components::Role::TT
 
+          - Will test for templates in prefered and config skin dirs
           - Restructured configuration attributes
             Deprecate stash page layout in favour of stash template layout
 
