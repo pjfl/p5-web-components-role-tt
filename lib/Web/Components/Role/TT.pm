@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.5.%d', q$Rev: 4 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.5.%d', q$Rev: 5 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -38,9 +38,9 @@ has '_templater' => is => 'lazy', isa => Object, builder => $_build__templater;
 my $_layout = sub {
    my ($conf, $stash) = @_;
 
+   my $page   = $stash->{page} //= {};
    my $plate  = $stash->{template} //= {};
-   my $page   = $stash->{page    } //= {};
-   my $layout = $plate->{layout  } //  $page->{layout} // $conf->layout;
+   my $layout = $page->{layout} // $plate->{layout} // $conf->layout;
 
    return $plate->{layout} = $page->{layout} = $layout;
 };
@@ -49,12 +49,12 @@ my $_skin = sub {
    my ($conf, $stash) = @_;
 
    my $plate = $stash->{template} //= {};
-   my $skin  = $plate->{skin    } //  $stash->{skin} // $conf->skin;
+   my $skin  = $plate->{skin} // $stash->{skin} // $conf->skin;
 
    return $plate->{skin} = $stash->{skin} = $skin;
 };
 
-my $_template_path = sub {
+my $_rel_template_path = sub {
    my ($self, $conf, $stash, $layout) = @_; my $templates = $self->templates;
 
    my $path = $templates->catfile( $_skin->( $conf, $stash ), "${layout}.tt" );
@@ -81,7 +81,7 @@ sub render_template {
          or throw $self->_templater->error;
    }
    else {
-      my $path = $self->$_template_path( $conf, $stash, $layout );
+      my $path = $self->$_rel_template_path( $conf, $stash, $layout );
 
       # uncoverable branch true
       $self->_templater->process( $path, $stash, \$result )
