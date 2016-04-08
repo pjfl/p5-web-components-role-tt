@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.5.%d', q$Rev: 5 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.6.%d', q$Rev: 1 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
