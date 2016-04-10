@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.6.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.6.%d', q$Rev: 2 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -10,9 +10,17 @@ use Template;
 use Unexpected::Functions      qw( PathNotFound throw );
 use Moo::Role;
 
-requires qw( config ); # layout root skin tempdir
+requires qw( config ); # layout skin tempdir vardir
 
 # Attribute constructors
+my $_build_templates = sub {
+   my $self = shift;
+   my $conf = $self->config;
+   my $dir  = $conf->vardir->catdir( 'templates' );
+
+   return $dir->exists ? $dir : $conf->root->catdir( 'templates' );
+};
+
 my $_build__templater = sub {
    my $self        =  shift;
    my $args        =  {
@@ -29,7 +37,7 @@ my $_build__templater = sub {
 
 # Public attributes
 has 'templates'  => is => 'lazy', isa => Directory, coerce => TRUE,
-   builder       => sub { $_[ 0 ]->config->root->catdir( 'templates' ) };
+   builder       => $_build_templates;
 
 # Private attributes
 has '_templater' => is => 'lazy', isa => Object, builder => $_build__templater;
