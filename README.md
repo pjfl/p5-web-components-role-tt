@@ -32,11 +32,33 @@ Defines the following attributes;
 - `templates`
 
     A lazily evaluated directory which defaults to `templates` in the configuration
-    root directory. This is where the templates are stored
+    `var` directory. This is where the templates are stored
 
     The path to the template file is `templates/<skin>/<layout>.tt`. The
     `skin` and `layout` attributes default to the values of the configuration
     object
+
+Requires the following attributes to be provided by the consuming class;
+
+- `config`
+
+    Requires the configuration attribute to provide the following attributes;
+
+    - `layout`
+
+        The default template name if none is provided in the stash
+
+    - `skin`
+
+        The default skin if none is provided in the stash
+
+    - `tempdir`
+
+        Path to the directory where [Template](https://metacpan.org/pod/Template) will store the compiled templates
+
+    - `vardir`
+
+        Path to the directory where the templates are stored
 
 # Subroutines/Methods
 

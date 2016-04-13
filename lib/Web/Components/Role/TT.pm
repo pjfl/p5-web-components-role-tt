@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.6.%d', q$Rev: 2 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.6.%d', q$Rev: 3 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -14,11 +14,11 @@ requires qw( config ); # layout skin tempdir vardir
 
 # Attribute constructors
 my $_build_templates = sub {
-   my $self = shift;
-   my $conf = $self->config;
-   my $dir  = $conf->vardir->catdir( 'templates' );
+   my $self = shift; my $conf = $self->config; my $dir;
 
-   return $dir->exists ? $dir : $conf->root->catdir( 'templates' );
+   $conf->can( 'vardir' ) and $dir = $conf->vardir->catdir( 'templates' );
+
+   return ($dir && $dir->exists) ? $dir : $conf->root->catdir( 'templates' );
 };
 
 my $_build__templater = sub {
@@ -145,11 +145,41 @@ Defines the following attributes;
 =item C<templates>
 
 A lazily evaluated directory which defaults to F<templates> in the configuration
-root directory. This is where the templates are stored
+F<var> directory. This is where the templates are stored
 
 The path to the template file is F<< templates/<skin>/<layout>.tt >>. The
 C<skin> and C<layout> attributes default to the values of the configuration
 object
+
+=back
+
+Requires the following attributes to be provided by the consuming class;
+
+=over 3
+
+=item C<config>
+
+Requires the configuration attribute to provide the following attributes;
+
+=over 3
+
+=item C<layout>
+
+The default template name if none is provided in the stash
+
+=item C<skin>
+
+The default skin if none is provided in the stash
+
+=item C<tempdir>
+
+Path to the directory where L<Template> will store the compiled templates
+
+=item C<vardir>
+
+Path to the directory where the templates are stored
+
+=back
 
 =back
 

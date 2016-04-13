@@ -52,6 +52,36 @@ eval { $test->render_template( { page => { layout => \$layout },
 
 like $EVAL_ERROR, qr{ \Qparse error\E }mx, 'Parse error';
 
+{  package TestConfig2;
+
+   use File::DataClass::IO;
+   use Moo;
+
+   has 'layout'  => is => 'ro', default => 'standard';
+   has 'skin'    => is => 'ro', default => 'default';
+   has 'tempdir' => is => 'ro', builder => sub { io[ 't' ] };
+   has 'vardir'  => is => 'ro', builder => sub { io[ 't' ] };
+}
+
+{  package Test2;
+
+   use Moo;
+
+   has 'config' => is => 'ro', builder => sub { TestConfig2->new };
+
+   with 'Web::Components::Role::TT';
+}
+
+$test = Test2->new;
+
+can_ok $test, 'render_template';
+
+is $test->templates, catdir( 't', 'templates' ), 'Template directory 2';
+
+$rendered = $test->render_template( {} ); chomp $rendered;
+
+is $rendered, '<!-- Layout standard -->', 'Renders template';
+
 done_testing;
 
 # Local Variables:
