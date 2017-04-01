@@ -1,5 +1,7 @@
 Revision history for Web::Components::Role::TT
 
+          - Toolchain update CVE-2016-1238
+
 0.7.1     2016-05-07 23:16:07
           - Prefer vardir over root for templates
 

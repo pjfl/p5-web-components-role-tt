@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.7.%d', q$Rev: 2 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.7.%d', q$Rev: 3 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -239,7 +239,7 @@ Peter Flanigan, C<< <pjfl@cpan.org> >>
 
 =head1 License and Copyright
 
-Copyright (c) 2016 Peter Flanigan. All rights reserved
+Copyright (c) 2017 Peter Flanigan. All rights reserved
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See L<perlartistic>
