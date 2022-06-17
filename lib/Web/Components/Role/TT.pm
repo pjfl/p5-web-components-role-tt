@@ -12,38 +12,70 @@ use Moo::Role;
 
 requires qw( config ); # layout skin tempdir vardir
 
+# Public attributes
+has 'templates'  =>
+   is            => 'lazy',
+   isa           => Directory,
+   coerce        => TRUE,
+   builder       => '_build_templates';
+
+# Private attributes
+has '_templater' =>
+   is            => 'lazy',
+   isa           => Object,
+   builder       => '_build__templater';
+
+# Public methods
+sub render_template {
+   my ($self, $stash) = @_;
+
+   $stash //= {};
+
+   my $result = NUL;
+   my $conf   = $stash->{config} //= $self->config;
+   my $layout = _layout($conf, $stash);
+
+   if (ref $layout) {
+      $self->_templater->process($layout, $stash, \$result)
+         or throw $self->_templater->error;
+   }
+   else {
+      my $path = $self->_rel_template_path($conf, $stash, $layout);
+
+      # uncoverable branch true
+      $self->_templater->process($path, $stash, \$result)
+         or throw $self->_templater->error;
+   }
+
+   return $result;
+}
+
 # Attribute constructors
-my $_build_templates = sub {
-   my $self = shift; my $conf = $self->config; my $dir;
+sub _build_templates {
+   my $self = shift;
+   my $conf = $self->config;
+   my $dir  = $conf->vardir->catdir('templates') if $conf->can('vardir');
 
-   $conf->can( 'vardir' ) and $dir = $conf->vardir->catdir( 'templates' );
+   return ($dir && $dir->exists) ? $dir : $conf->root->catdir('templates');
+}
 
-   return ($dir && $dir->exists) ? $dir : $conf->root->catdir( 'templates' );
-};
-
-my $_build__templater = sub {
+sub _build__templater {
    my $self        =  shift;
    my $args        =  {
-      COMPILE_DIR  => $self->config->tempdir->catdir( 'ttc' ),
+      COMPILE_DIR  => $self->config->tempdir->catdir('ttc'),
       COMPILE_EXT  => 'c',
       ENCODING     => 'utf8',
       RELATIVE     => TRUE,
-      INCLUDE_PATH => [ $self->templates->pathname ], };
+      INCLUDE_PATH => [$self->templates->pathname],
+   };
    # uncoverable branch true
-   my $template    =  Template->new( $args ) or throw $Template::ERROR;
+   my $template    =  Template->new($args) or throw $Template::ERROR;
 
    return $template;
-};
-
-# Public attributes
-has 'templates'  => is => 'lazy', isa => Directory, coerce => TRUE,
-   builder       => $_build_templates;
-
-# Private attributes
-has '_templater' => is => 'lazy', isa => Object, builder => $_build__templater;
+}
 
 # Private functions
-my $_layout = sub {
+sub _layout {
    my ($conf, $stash) = @_;
 
    my $page   = $stash->{page} //= {};
@@ -51,52 +83,31 @@ my $_layout = sub {
    my $layout = $plate->{layout} // $page->{layout} // $conf->layout;
 
    return $plate->{layout} = $page->{layout} = $layout;
-};
+}
 
-my $_skin = sub {
+sub _skin {
    my ($conf, $stash) = @_;
 
    my $plate = $stash->{template} //= {};
    my $skin  = $plate->{skin} // $stash->{skin} // $conf->skin;
 
    return $plate->{skin} = $stash->{skin} = $skin;
-};
+}
 
-my $_rel_template_path = sub {
-   my ($self, $conf, $stash, $layout) = @_; my $templates = $self->templates;
+sub _rel_template_path {
+   my ($self, $conf, $stash, $layout) = @_;
 
-   my $path = $templates->catfile( $_skin->( $conf, $stash ), "${layout}.tt" );
+   my $templates = $self->templates;
 
-   $path->exists and return $path->abs2rel( $templates );
+   my $path = $templates->catfile(_skin($conf, $stash), "${layout}.tt");
 
-   my $alt  = $templates->catfile( $conf->skin, "${layout}.tt" );
+   return $path->abs2rel($templates) if $path->exists;
 
-   $alt->exists or throw PathNotFound, [ $path ];
+   my $alt = $templates->catfile($conf->skin, "${layout}.tt");
 
-   return $alt->abs2rel( $templates );
-};
+   throw PathNotFound, [ $path ] unless $alt->exists;
 
-# Public methods
-sub render_template {
-   my ($self, $stash) = @_; $stash //= {};
-
-   my $result = NUL;
-   my $conf   = $stash->{config} //= $self->config;
-   my $layout = $_layout->( $conf, $stash );
-
-   if (ref $layout) {
-      $self->_templater->process( $layout, $stash, \$result )
-         or throw $self->_templater->error;
-   }
-   else {
-      my $path = $self->$_rel_template_path( $conf, $stash, $layout );
-
-      # uncoverable branch true
-      $self->_templater->process( $path, $stash, \$result )
-         or throw $self->_templater->error;
-   }
-
-   return $result;
+   return $alt->abs2rel($templates);
 }
 
 1;
