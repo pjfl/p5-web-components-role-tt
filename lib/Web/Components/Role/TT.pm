@@ -2,7 +2,7 @@ package Web::Components::Role::TT;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.8.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.8.%d', q$Rev: 2 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
@@ -32,19 +32,19 @@ sub render_template {
    $stash //= {};
 
    my $result = NUL;
-   my $conf   = $stash->{config} //= $self->config;
-   my $layout = _layout($conf, $stash);
+   my $config = $stash->{config} //= $self->config;
+   my $layout = _layout($config, $stash);
 
    if (ref $layout) {
       $self->_templater->process($layout, $stash, \$result)
          or throw $self->_templater->error;
    }
    else {
-      my $path = $self->_rel_template_path($conf, $stash, $layout);
+      my $path = $self->_rel_template_path($config, $stash, $layout);
+      my $rv   = $self->_templater->process($path, $stash, \$result);
 
-      # uncoverable branch true
-      $self->_templater->process($path, $stash, \$result)
-         or throw $self->_templater->error;
+      # uncoverable branch false
+      throw $self->_templater->error unless $rv;
    }
 
    return $result;
