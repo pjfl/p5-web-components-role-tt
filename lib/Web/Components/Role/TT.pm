@@ -1,13 +1,12 @@
 package Web::Components::Role::TT;
 
 use 5.010001;
-use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.8.%d', q$Rev: 2 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.8.%d', q$Rev: 3 $ =~ /\d+/gmx );
 
 use File::DataClass::Constants qw( EXCEPTION_CLASS NUL TRUE );
 use File::DataClass::Types     qw( Directory Object );
-use Template;
 use Unexpected::Functions      qw( PathNotFound throw );
+use Template;
 use Moo::Role;
 
 requires qw( config ); # layout skin tempdir vardir
@@ -32,37 +31,29 @@ sub render_template {
    $stash //= {};
 
    my $result = NUL;
-   my $config = $stash->{config} //= $self->config;
-   my $layout = _layout($config, $stash);
+   my $layout = $self->_layout($stash);
+   my $rv     = $self->_templater->process($layout, $stash, \$result);
 
-   if (ref $layout) {
-      $self->_templater->process($layout, $stash, \$result)
-         or throw $self->_templater->error;
-   }
-   else {
-      my $path = $self->_rel_template_path($config, $stash, $layout);
-      my $rv   = $self->_templater->process($path, $stash, \$result);
-
-      # uncoverable branch false
-      throw $self->_templater->error unless $rv;
-   }
+   throw $self->_templater->error unless $rv;
 
    return $result;
 }
 
 # Attribute constructors
 sub _build_templates {
-   my $self = shift;
-   my $conf = $self->config;
-   my $dir  = $conf->vardir->catdir('templates') if $conf->can('vardir');
+   my $self   = shift;
+   my $config = $self->config;
+   my $dir;
 
-   return ($dir && $dir->exists) ? $dir : $conf->root->catdir('templates');
+   $dir = $config->vardir->catdir('templates') if $config->can('vardir');
+
+   return ($dir && $dir->exists) ? $dir : $config->root->catdir('templates');
 }
 
 sub _build__templater {
    my $self        =  shift;
    my $args        =  {
-      COMPILE_DIR  => $self->config->tempdir->catdir('ttc'),
+      COMPILE_DIR  => $self->config->tempdir->catdir('ttc')->pathname,
       COMPILE_EXT  => 'c',
       ENCODING     => 'utf8',
       RELATIVE     => TRUE,
@@ -74,41 +65,49 @@ sub _build__templater {
    return $template;
 }
 
-# Private functions
+# Private methods
 sub _layout {
-   my ($conf, $stash) = @_;
+   my ($self, $stash) = @_;
 
+   my $config = $stash->{config} //= $self->config;
    my $page   = $stash->{page} //= {};
    my $plate  = $stash->{template} //= {};
-   my $layout = $plate->{layout} // $page->{layout} // $conf->layout;
+   my $layout = $plate->{layout} || $page->{layout} || $config->layout;
 
-   return $plate->{layout} = $page->{layout} = $layout;
+   $plate->{layout} = $page->{layout} = $layout;
+
+   $layout = $self->_rel_template_path($config, $stash, $layout)
+      unless ref $layout;
+
+   return $layout;
 }
 
+sub _rel_template_path {
+   my ($self, $config, $stash, $layout) = @_;
+
+   my $templates = $self->templates;
+   my $path      = $templates->catfile(_skin($config, $stash), "${layout}.tt");
+
+   return $path->abs2rel($templates) if $path->exists;
+
+   my $alt = $templates->catfile($config->skin, "${layout}.tt");
+
+   throw PathNotFound, [$path] unless $alt->exists;
+
+   return $alt->abs2rel($templates);
+}
+
+# Private functions
 sub _skin {
-   my ($conf, $stash) = @_;
+   my ($config, $stash) = @_;
 
    my $plate = $stash->{template} //= {};
-   my $skin  = $plate->{skin} // $stash->{skin} // $conf->skin;
+   my $skin  = $plate->{skin} || $stash->{skin} || $config->skin;
 
    return $plate->{skin} = $stash->{skin} = $skin;
 }
 
-sub _rel_template_path {
-   my ($self, $conf, $stash, $layout) = @_;
-
-   my $templates = $self->templates;
-
-   my $path = $templates->catfile(_skin($conf, $stash), "${layout}.tt");
-
-   return $path->abs2rel($templates) if $path->exists;
-
-   my $alt = $templates->catfile($conf->skin, "${layout}.tt");
-
-   throw PathNotFound, [ $path ] unless $alt->exists;
-
-   return $alt->abs2rel($templates);
-}
+use namespace::autoclean;
 
 1;
 

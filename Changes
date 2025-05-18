@@ -1,5 +1,6 @@
 Revision history for Web::Components::Role::TT
 
+          - Cleaned up template selection logic
           - Capture rv of templater process
 
 0.8.1     2017-04-01 09:11:41
